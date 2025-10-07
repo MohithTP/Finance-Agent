@@ -1,7 +1,7 @@
 from textwrap import dedent
 import requests
 import os
-import json 
+import json # Added json import for better tool handling
 from typing import Any, Dict, List, Optional
 
 from agno.agent import Agent
@@ -148,43 +148,20 @@ class FinancialDatasetsTools(Toolkit):
 
 financial_analyst_agent = Agent(
     name="Financial Analyst Agent",
-    role=(
-        "Analyzes financial data, market trends, and company performance to provide "
-        "investment insights for the **Indian Market (NSE/BSE)**."
-    ),
+    role="Analyzes financial data, market trends, and company performance to provide investment insights for the **Indian Market (NSE/BSE)**.",
     model=Gemini(id=os.environ["DEFAULT_MODEL"]),
-    tools=[FinancialDatasetsTools(api_key=os.environ.get(FMP_API_KEY_ENV))],
+    tools=[FinancialDatasetsTools(api_key=os.environ[FMP_API_KEY_ENV])],
     instructions=dedent("""
-        1. **Initial Market Screen:**  
-           Use the `get_indian_market_screen` tool (country='IN', change_over_period='1d', min_change_percent=3.0)  
-           to identify top-performing Indian stocks based on yesterday's price changes.
-
-        2. **Filter & Select:**  
-           From the screen results, choose 3–5 promising **large-cap or mid-cap** companies that show strong momentum.
-
-        3. **Fundamental Analysis:**  
-           For each selected company:
-             - Use `get_income_statements`, `get_balance_sheets`, and `get_cash_flow_statements`  
-               to understand profitability, debt/equity, and cash flow.
-             - Use `get_company_info` and `get_financial_metrics` (if available) to evaluate fundamentals.
-
-        4. **Qualitative Research:**  
-           If needed, delegate to the Web Search Agent for the latest **news, trends, and future outlook**  
-           on each company or sector.
-
-        5. **Scoring and Output:**  
-           Assign an **Analyst Score (1–10)** for each company:
-             - 50% weight: Fundamental Health (profitability, balance sheet strength)
-             - 50% weight: Future Outlook & Sentiment (news/trends)
-
-        6. **Presentation:**  
-           Return a **markdown table** with columns:
-             - Company
-             - Sector
-             - Key Financials
-             - Analyst Score
-             - Investment Rationale
+        1. **Initial Screen:** Use the 'get_indian_market_screen' tool first to identify top gainers from the previous day's trends (country=IN, 1d period).
+        2. **Filter & Select:** Choose 3-5 of the most promising large-cap/mid-cap companies from the screener results.
+        3. **Fundamental Analysis (Tools):** Use financial tools (e.g., `get_income_statements`, `get_financial_metrics`) for deep fundamental analysis of the selected tickers (remember the .NS/.BO suffix).
+        4. **Qualitative Analysis (Delegation):** If necessary, request the 'Web Search Agent' to find the latest news, sector outlook, and future growth drivers for the selected companies.
+        5. **Novel Feature (The Analyst Score):** In your final output table, include an **Analyst Score (1-10)** based on a combination of: 
+           - **Fundamental Health (50% weight):** Profitability, Debt/Equity, Cash Flow.
+           - **Future Outlook & News Sentiment (50% weight):** Market trends, sector growth, and recent news gathered by the Web Search Agent.
+        6. Use tables to display data and provide a concise rationale for each recommendation.
     """),
+    add_datetime_to_instructions=True,
 )
 
 web_agent = Agent(
@@ -193,12 +170,13 @@ web_agent = Agent(
     model=Gemini(id=os.environ["DEFAULT_MODEL"]),
     tools=[DuckDuckGoTools()],
     instructions="Always include sources. Focus search queries on the **Indian stock market** (e.g., 'future of Indian IT sector', 'recent news for TCS India'). Do not attempt to scrape lists of top gainers, rely on the Analyst Agent's market screen for that.",
+    add_datetime_to_instructions=True,
 )
 
 
 team_leader = Team(
     name="Reasoning Finance Team Leader",
-    #mode="coordinate",
+    mode="coordinate",
     model=Gemini(id=os.environ["DEFAULT_MODEL"]),
     members=[web_agent, financial_analyst_agent],
     tools=[ReasoningTools(add_instructions=True)],
@@ -208,8 +186,9 @@ team_leader = Team(
     ],
     markdown=True,
     show_members_responses=True,
-    enable_agentic_state=True,
-    #success_criteria="The team has successfully identified and analyzed promising Indian stocks for long-term investment, providing a rationale and the Analyst Score.",
+    enable_agentic_context=True,
+    add_datetime_to_instructions=True,
+    success_criteria="The team has successfully identified and analyzed promising Indian stocks for long-term investment, providing a rationale and the Analyst Score.",
 )
 
 

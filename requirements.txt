@@ -3,9 +3,11 @@ agno
 pydantic
 requests
 python-dotenv
+google-genai
 
 # Web Search Tool dependency
 duckduckgo-search
+ddgs
 
 # Web Server (necessary for Render)
 fastapi

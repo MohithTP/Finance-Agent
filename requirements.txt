@@ -1,0 +1,12 @@
+# Core AGNO framework and dependencies
+agno
+pydantic
+requests
+python-dotenv
+
+# Web Search Tool dependency
+duckduckgo-search
+
+# Web Server (necessary for Render)
+fastapi
+uvicorn

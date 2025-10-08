@@ -1,131 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indian Finance Agent</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom styles for clean layout and Markdown content */
-        body {
-            background-color: #f7f9fb; /* Very light gray background */
-            font-family: 'Inter', sans-serif;
-        }
-        .container {
-            max-width: 900px;
-        }
-        .result-box {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            padding: 2rem;
-            min-height: 200px; /* Gives space even when empty */
-            white-space: pre-wrap; /* Preserve markdown formatting */
-        }
-        /* Style for Markdown content, especially tables and headers */
-        .markdown-output h1 { font-size: 2.25rem; font-weight: 700; margin-top: 1.5rem; }
-        .markdown-output h2 { font-size: 1.75rem; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem; margin-top: 1.5rem; }
-        .markdown-output table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-        .markdown-output th, .markdown-output td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
-        .markdown-output th { background-color: #f3f4f6; font-weight: 600; }
-        .loading-animation {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            display: none; /* Hidden by default */
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .error-message {
-            color: #ef4444; /* Tailwind red-500 */
-            background-color: #fee2e2; /* Tailwind red-100 */
-            padding: 1rem;
-            border-radius: 6px;
-            border: 1px solid #fca5a5;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indian Finance Agent</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #0b0b0b;
+      font-family: 'Inter', sans-serif;
+      color: #e5e7eb;
+    }
+    .loading {
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top: 3px solid #6366f1;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
-<body class="p-8">
 
-    <div class="container mx-auto">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-extrabold text-gray-800 mb-2">Indian Finance Agent</h1>
-            <p class="text-xl text-gray-500">Intelligent Stock Analysis powered by Google Gemini</p>
-        </header>
+<body class="flex flex-col items-center min-h-screen py-10 px-4">
+  <div class="w-full max-w-2xl">
+    <h1 class="text-3xl font-bold text-center text-indigo-400 mb-2">Indian Finance Agent</h1>
+    <p class="text-center text-gray-400 mb-8 text-sm">AI-powered stock analysis and insights</p>
 
-        <form method="POST" action="/analyze" class="mb-10 p-6 bg-white rounded-lg shadow-md" onsubmit="showLoading()">
-            <label for="task" class="block text-lg font-medium text-gray-700 mb-2">Your Analysis Task for the Agent:</label>
-            <textarea id="task" name="task" rows="4" required 
-                      class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-lg border-gray-300 rounded-md p-3"
-                      placeholder="e.g., Identify top-performing Indian companies, analyze their fundamentals, and provide a long-term investment rationale."
-            >{{ "Identify top-performing Indian companies based on the previous day's stock trends. Analyze their financial performance, market position, and future outlook. Provide a list of promising stocks for long-term investment, along with a brief rationale for each, including the new 'Analyst Score' (1-10)." if not analysis_result else task_input }}</textarea>
-            
-            <div class="mt-4 flex items-center justify-end">
-                <div id="loading" class="loading-animation mr-4"></div>
-                <button type="submit" id="submit-button"
-                        class="px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Run Analysis
-                </button>
-            </div>
-        </form>
+    <form method="POST" action="/analyze" onsubmit="showLoading()" class="flex flex-col gap-4">
+      <textarea id="task" name="task" rows="4" required
+        class="bg-zinc-900 text-gray-100 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none text-sm"
+        placeholder="Enter your analysis request here...">{{ "Identify top-performing Indian companies and analyze their fundamentals." if not analysis_result else task_input }}</textarea>
 
-        <h2 class="text-3xl font-semibold text-gray-700 mb-4">Agent Analysis Result</h2>
-        <div class="result-box markdown-output">
-            {% if analysis_result %}
-                {{ analysis_result | safe }}
-            {% else %}
-                <p class="text-gray-500">Submit a task above to generate a report...</p>
-            {% endif %}
-        </div>
+      <div class="flex justify-end items-center gap-3">
+        <div id="loading" class="loading"></div>
+        <button id="submit-button" type="submit"
+          class="px-5 py-2.5 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 transition disabled:opacity-50">
+          Run Analysis
+        </button>
+      </div>
+    </form>
 
+    <div class="mt-8">
+      <h2 class="text-lg font-semibold text-gray-300 mb-3">Result</h2>
+      <div class="bg-zinc-900 rounded-md p-4 min-h-[180px] text-sm whitespace-pre-wrap">
+        {% if analysis_result %}
+          {{ analysis_result | safe }}
+        {% else %}
+          <p class="text-gray-500">Submit a query to generate your analysis...</p>
+        {% endif %}
+      </div>
     </div>
+  </div>
 
-    <script>
-        const loadingSpinner = document.getElementById('loading');
-        const submitButton = document.getElementById('submit-button');
-        const taskInput = document.getElementById('task');
+  <script>
+    const loading = document.getElementById("loading");
+    const button = document.getElementById("submit-button");
+    const taskInput = document.getElementById("task");
 
-        // Store the task input value before submission to retain it on the post-response page
-        let lastTask = taskInput.value;
-        
-        function showLoading() {
-            // Store the current task text before submission
-            document.cookie = "task_input=" + encodeURIComponent(taskInput.value) + ";path=/";
-            
-            loadingSpinner.style.display = 'block';
-            submitButton.disabled = true;
-            submitButton.classList.add('opacity-50', 'cursor-not-allowed');
-            submitButton.textContent = 'Analyzing...';
-            // Prevent accidental double-submission
-        }
-        
-        // Function to retrieve cookie value
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        }
+    function showLoading() {
+      document.cookie = "task_input=" + encodeURIComponent(taskInput.value) + ";path=/";
+      loading.style.display = "block";
+      button.disabled = true;
+      button.textContent = "Analyzing...";
+    }
 
-        // On page load, retrieve the last successful task input
-        window.onload = function() {
-            const storedTask = getCookie('task_input');
-            if (storedTask) {
-                // Only restore if the current text area is empty (which it won't be if FastAPI sets it)
-                if (!taskInput.value || taskInput.value.includes("Identify top-performing")) {
-                    taskInput.value = decodeURIComponent(storedTask);
-                }
-                // Clear the cookie to prevent perpetual restoration
-                document.cookie = "task_input=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            }
-
-            // Note: The Markdown output includes raw HTML tables, which need to be rendered.
-            // FastAPI is already using `| safe` to allow this, so no extra client-side conversion is needed.
-        };
-    </script>
+    window.onload = function() {
+      const parts = (`; ${document.cookie}`).split(`; task_input=`);
+      if (parts.length === 2) {
+        taskInput.value = decodeURIComponent(parts.pop().split(';').shift());
+        document.cookie = "task_input=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      }
+    };
+  </script>
 </body>
 </html>

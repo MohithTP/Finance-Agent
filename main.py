@@ -79,4 +79,10 @@ async def analyze_indian_stocks(task: str):
 @app.get("/health")
 def health_check():
     # The health check keeps the service from spinning down if regularly pinged (but consumes 750 free hours)
-    return {"status": "ok"}
+    return {
+        "message": "Welcome to the Indian Finance Agent API. Use the /analyze endpoint with a POST request to submit a task.",
+        "endpoints": {
+            "health_check": "/health (GET)",
+            "analysis": "/analyze (POST)"
+        }
+    }

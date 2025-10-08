@@ -12,3 +12,9 @@ ddgs
 # Web Server (necessary for Render)
 fastapi
 uvicorn
+
+#server side dependency
+sse-starlette 
+
+frontend template 
+jinja2 python-multipart

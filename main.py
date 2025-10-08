@@ -28,7 +28,7 @@ def initialize_team_leader():
     # 2. Re-create Team Leader with correct members
     team_leader = Team(
         name="Reasoning Finance Team Leader",
-        mode="coordinate",
+        #mode="coordinate",
         model=fa_agent.model,
         members=[wa_agent, fa_agent],
         tools=[ReasoningTools(add_instructions=True)],
@@ -38,9 +38,9 @@ def initialize_team_leader():
         ],
         markdown=True,
         show_members_responses=False, 
-        enable_agentic_context=True,
-        add_datetime_to_instructions=True,
-        success_criteria="The team has successfully identified and analyzed promising Indian stocks for long-term investment, providing a rationale and the Analyst Score.",
+        enable_agentic_state=True,
+        #add_datetime_to_instructions=True,
+        #success_criteria="The team has successfully identified and analyzed promising Indian stocks for long-term investment, providing a rationale and the Analyst Score.",
     )
     return team_leader
 

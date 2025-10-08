@@ -16,5 +16,5 @@ uvicorn
 #server side dependency
 sse-starlette 
 
-frontend template 
+#frontend template 
 jinja2 python-multipart

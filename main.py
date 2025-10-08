@@ -56,7 +56,7 @@ async def analyze_indian_stocks(request: Request, task: str = Form(...)):
     Triggers the multi-agent system and returns the result to the main page.
     Uses Form(...) to read the 'task' field from the HTML form post.
     """
-    if not os.environ.get(FMP_API_KEY_ENV) or not os.environ.get("GEMINI_API_KEY"):
+    if not os.environ.get(FMP_API_KEY_ENV) or not os.environ.get("GOOGLE_API_KEY"):
         error_detail = "Required API keys are not configured in the environment."
         return templates.TemplateResponse(
             "index.html", 

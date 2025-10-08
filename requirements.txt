@@ -17,4 +17,5 @@ uvicorn
 sse-starlette 
 
 #frontend template 
-jinja2 python-multipart
+jinja2
+python-multipart

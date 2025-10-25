@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
-
+import traceback
 # Import the logic and definitions from your agent file
 from agent_setup import financial_analyst_agent, web_agent, Team, ReasoningTools, FMP_API_KEY_ENV
 
@@ -82,12 +82,10 @@ async def analyze_indian_stocks(request: Request, task: str = Form(...)):
         )
 
     except Exception as e:
+        print("======= AGENT ERROR TRACEBACK =======")
+        traceback.print_exc()     # <--- THIS WILL SHOW REAL ERROR IN LOGS
+        print("=====================================")
         error_detail = f"Agent execution failed. Internal error: {str(e)}"
-        print(f"Agent Execution Error: {e}")
-        return templates.TemplateResponse(
-            "index.html", 
-            {"request": request, "analysis_result": f"<div class='error-message'>{error_detail}</div>"}
-        )
 
 # Keep the health check for deployment services
 @app.get("/health")

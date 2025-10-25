@@ -30,6 +30,7 @@ def initialize_team_leader():
         members=[wa_agent, fa_agent],
         tools=[ReasoningTools(add_instructions=True)],
         instructions=[
+            "Always return a final_answer at the end.",
             "Use tables to display data.",
             "Provide the analysis and recommendations clearly, including the Analyst Score.",
         ],
@@ -69,8 +70,9 @@ async def analyze_indian_stocks(request: Request, task: str = Form(...)):
         # This will be the full markdown string analysis
         final_response = team_leader.run(
             task,
-            stream=False, 
+            stream=False,
             show_full_reasoning=False,
+            return_final_response=True,
         )
         
         # Return the analysis back to the index.html template

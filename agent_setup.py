@@ -70,7 +70,7 @@ class FinancialDatasetsTools(Toolkit):
             log_error(f"Error making request to {url}: {str(e)}")
             return json.dumps(error_details)
     
-    # --- ENHANCEMENT 1: Dedicated Indian Market Screener Tool (Addresses the core failure) ---
+    # --- ENHANCEMENT 1: Dedicated Indian Market Screener Tool ---
     @tool(name="get_indian_market_screen", 
           description="Finds top-performing stocks. Use this tool *first* to identify Indian stocks (e.g., set 'country=IN', 'change_over_period=1d', and 'min_change_percent=3.0').")
     def get_indian_market_screen(
@@ -161,7 +161,7 @@ financial_analyst_agent = Agent(
            - **Future Outlook & News Sentiment (50% weight):** Market trends, sector growth, and recent news gathered by the Web Search Agent.
         6. Use tables to display data and provide a concise rationale for each recommendation.
     """),
-    #add_datetime_to_instructions=True,
+    add_datetime_to_instructions=True,
 )
 
 web_agent = Agent(
@@ -170,13 +170,13 @@ web_agent = Agent(
     model=Gemini(id=os.environ["DEFAULT_MODEL"]),
     tools=[DuckDuckGoTools()],
     instructions="Always include sources. Focus search queries on the **Indian stock market** (e.g., 'future of Indian IT sector', 'recent news for TCS India'). Do not attempt to scrape lists of top gainers, rely on the Analyst Agent's market screen for that.",
-    #add_datetime_to_instructions=True,
+    add_datetime_to_instructions=True,
 )
 
 
 team_leader = Team(
     name="Reasoning Finance Team Leader",
-    #mode="coordinate",
+    mode="coordinate",
     model=Gemini(id=os.environ["DEFAULT_MODEL"]),
     members=[web_agent, financial_analyst_agent],
     tools=[ReasoningTools(add_instructions=True)],
@@ -186,9 +186,9 @@ team_leader = Team(
     ],
     markdown=True,
     show_members_responses=True,
-    enable_agentic_state=True,
-    #add_datetime_to_instructions=True,
-    #success_criteria="The team has successfully identified and analyzed promising Indian stocks for long-term investment, providing a rationale and the Analyst Score.",
+    enable_agentic_context=True,
+    add_datetime_to_instructions=True,
+    success_criteria="The team has successfully identified and analyzed promising Indian stocks for long-term investment, providing a rationale and the Analyst Score.",
 )
 
 
